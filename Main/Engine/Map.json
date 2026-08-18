@@ -1,291 +1,37 @@
 [
   {
-<<<<<<< HEAD
-    "RoomID": "outside",
-    "Name": "Outside ACE Hospital",
-    "Description": "Rain pours on the dark streets outside ACE Hospital. High walls loom above you, and an unsecured ventilation terminal sits nearby.",
-    "SecurityZone": "Unmonitored",
-    "IsVent": false,
-    "BaseDC": 10,
-    "ConnectedRoomIDs": ["lobby", "lobby_vents", "emergency_room"]
-  },
-  {
-    "RoomID": "lobby",
-    "Name": "Main Lobby",
-    "Description": "A clean lobby with modern clinical decor. Security sweep cameras track movements across the main entrance.",
-    "SecurityZone": "Monitored",
-    "IsVent": false,
-    "BaseDC": 10,
-    "ConnectedRoomIDs": [
-=======
-    "roomId": "outside",
-    "roomName": "Outside ACE Hospital",
-    "description": "Rain pours on the dark streets outside ACE Hospital in Butuan City. The building entrance lies ahead, and a vent layout is visible nearby.",
-    "baseDC": 10,
-    "isMonitored": false,
-    "connections": ["lobby", "lobby_vents", "emergency_room"]
-  },
-  {
-    "roomId": "lobby",
-    "roomName": "Main Lobby",
-    "description": "A polished lobby with modern corporate aesthetics. A reception desk and security terminals stand near the entrance.",
-    "baseDC": 10,
-    "isMonitored": true,
-    "connections": [
->>>>>>> 993e84fb50430dedc72f23580b65cf9526fa6fed
-      "outside",
-      "employee_hallway_l1",
-      "lobby_vents",
-      "emergency_room"
-    ]
-  },
-  {
-<<<<<<< HEAD
-    "RoomID": "emergency_room",
-    "Name": "Emergency Room",
-    "Description": "Littered with patient dividers and diagnostic monitors. Guard patrols inspect medical stations regularly.",
-    "SecurityZone": "Patrolled",
-    "IsVent": false,
-    "BaseDC": 15,
-    "ConnectedRoomIDs": ["lobby", "lobby_vents"]
-  },
-  {
-    "RoomID": "lobby_vents",
-    "Name": "Lobby Vents",
-    "Description": "A dusty, cramped maintenance duct directly above the main reception floor.",
-    "SecurityZone": "Unmonitored",
-    "IsVent": true,
-    "CorrespondingRoomID": "lobby",
-    "BaseDC": 10,
-    "ConnectedRoomIDs": [
-=======
-    "roomId": "emergency_room",
-    "roomName": "Emergency Room",
-    "description": "Littered with high-tech hospital apparatus and diagnostic beds. Quiet, but staff patrol regularly.",
-    "baseDC": 15,
-    "isMonitored": true,
-    "connections": ["lobby", "lobby_vents"]
-  },
-  {
-    "roomId": "lobby_vents",
-    "roomName": "Lobby Vents",
-    "description": "A dark, cramped duct system positioned directly above the main reception lobby.",
-    "baseDC": 10,
-    "isMonitored": false,
-    "connections": [
->>>>>>> 993e84fb50430dedc72f23580b65cf9526fa6fed
-      "lobby",
-      "power_room_vents",
-      "mainframe_room_vents",
-      "maintenance_room_vents"
-    ]
-  },
-  {
-<<<<<<< HEAD
-    "RoomID": "employee_hallway_l1",
-    "Name": "Employee Hallway (Level 1)",
-    "Description": "A hallway requiring security credentials. Overhead optical scanners sweep back and forth.",
-    "SecurityZone": "Monitored",
-    "IsVent": false,
-    "BaseDC": 10,
-    "ConnectedRoomIDs": ["lobby", "employee_hallway_l2", "lobby_vents"]
-  },
-  {
-    "RoomID": "employee_hallway_l2",
-    "Name": "Employee Hallway (Level 2)",
-    "Description": "A secure restricted corridor. Power distribution panels connect to this floor.",
-    "SecurityZone": "Monitored",
-    "IsVent": false,
-    "BaseDC": 15,
-    "ConnectedRoomIDs": [
-=======
-    "roomId": "employee_hallway_l1",
-    "roomName": "Employee Hallway (Level 1)",
-    "description": "A brightly lit security hallway requiring credentials. Cameras sweep back and forth.",
-    "baseDC": 10,
-    "isMonitored": true,
-    "connections": ["lobby", "employee_hallway_l2", "lobby_vents"]
-  },
-  {
-    "roomId": "employee_hallway_l2",
-    "roomName": "Employee Hallway (Level 2)",
-    "description": "A higher security restricted section. Power distribution and backup grid rooms connect to this floor.",
-    "baseDC": 15,
-    "isMonitored": true,
-    "connections": [
->>>>>>> 993e84fb50430dedc72f23580b65cf9526fa6fed
-      "employee_hallway_l1",
-      "employee_hallway_l3",
-      "power_room",
-      "lobby_vents"
-    ]
-  },
-  {
-<<<<<<< HEAD
-    "RoomID": "employee_hallway_l3",
-    "Name": "Employee Hallway (Level 3)",
-    "Description": "Deep facility level. Warning alerts reflect off reinforced doors leading to the core data vault.",
-    "SecurityZone": "Monitored",
-    "IsVent": false,
-    "BaseDC": 15,
-    "ConnectedRoomIDs": [
-      "employee_hallway_l2",
-      "mainframe_doors",
-      "lobby_vents"
-    ]
-  },
-  {
-    "RoomID": "power_room",
-    "Name": "Power Room",
-    "Description": "A room humming with transformer modules. Interfacing with power lines here can disable local grids.",
-    "SecurityZone": "Monitored",
-    "IsVent": false,
-    "BaseDC": 10,
-    "ConnectedRoomIDs": ["employee_hallway_l2", "power_room_vents"]
-  },
-  {
-    "RoomID": "mainframe_doors",
-    "Name": "Mainframe Door",
-    "Description": "A heavy blast door locking down the server room entrance.",
-    "SecurityZone": "Monitored",
-    "IsVent": false,
-    "BaseDC": 18,
-    "ConnectedRoomIDs": ["employee_hallway_l3", "server_room"]
-  },
-  {
-    "RoomID": "server_room",
-    "Name": "Server Room",
-    "Description": "Cold racks storing facility databanks. The server interface terminal hums in the center of the room.",
-    "SecurityZone": "Patrolled",
-    "IsVent": false,
-    "BaseDC": 15,
-    "ConnectedRoomIDs": ["mainframe_doors", "mainframe_room_vents"]
-  },
-  {
-    "RoomID": "power_room_vents",
-    "Name": "Power Room Vents",
-    "Description": "A ventilation pipeline passing directly over active generator rigs.",
-    "SecurityZone": "Unmonitored",
-    "IsVent": true,
-    "CorrespondingRoomID": "power_room",
-    "BaseDC": 10,
-    "ConnectedRoomIDs": ["lobby_vents", "mainframe_room_vents", "power_room"]
-  },
-  {
-    "RoomID": "mainframe_room_vents",
-    "Name": "Mainframe Room Vents",
-    "Description": "High-altitude duct systems tracking over core database servers.",
-    "SecurityZone": "Unmonitored",
-    "IsVent": true,
-    "CorrespondingRoomID": "server_room",
-    "BaseDC": 10,
-    "ConnectedRoomIDs": ["lobby_vents", "server_room", "maintenance_room_vents"]
-  },
-  {
-    "RoomID": "maintenance_room_vents",
+    "RoomID": "maintenance_vents",
     "Name": "Maintenance Room Vents",
-    "Description": "A damp ventilation trunk with vertical utility ladders leading to the building's roof line.",
+    "Description": "Damp, tight air ducts running above the maintenance complex.",
     "SecurityZone": "Unmonitored",
     "IsVent": true,
     "CorrespondingRoomID": "maintenance_room",
-    "BaseDC": 10,
-    "ConnectedRoomIDs": [
-      "lobby_vents",
-      "maintenance_room",
-      "rooftop_access_corridor"
-    ]
+    "ConnectedRoomIDs": ["power_vents", "maintenance_room"]
   },
   {
     "RoomID": "maintenance_room",
     "Name": "Maintenance Room",
-    "Description": "A dark utility basement. Dripping steam pipes have coated the concrete floor in condensation.",
-    "SecurityZone": "Patrolled",
-    "IsVent": false,
-    "CorrespondingRoomID": "maintenance_room_vents",
-    "HazardType": "WetPipes",
-    "BaseDC": 10,
-    "ConnectedRoomIDs": ["maintenance_room_vents", "power_room"]
-  },
-  {
-    "RoomID": "rooftop_access_corridor",
-    "Name": "Rooftop Access Corridor",
-    "Description": "A secure maintenance passage directly below the helipad under open sky.",
+    "Description": "Filled with heavy machinery, humming generators, and ventilation shafts.",
     "SecurityZone": "Monitored",
     "IsVent": false,
     "BaseDC": 12,
-    "ConnectedRoomIDs": ["maintenance_room_vents", "rooftop_helipad"]
+    "ConnectedRoomIDs": ["maintenance_vents", "ground_floor_lobby"]
   },
   {
-    "RoomID": "rooftop_helipad",
-    "Name": "Rooftop Helipad",
-    "Description": "The high-elevation landing deck of ACE Hospital. Automated defensive turret grids monitor the landing perimeter.",
+    "RoomID": "ground_floor_lobby",
+    "Name": "Ground Floor Lobby",
+    "Description": "The main floor lobby leading directly toward the heavy security exit doors.",
     "SecurityZone": "Patrolled",
     "IsVent": false,
-    "BaseDC": 15,
-    "ConnectedRoomIDs": ["rooftop_access_corridor"]
-=======
-    "roomId": "employee_hallway_l3",
-    "roomName": "Employee Hallway (Level 3)",
-    "description": "Maximum security level. Red ambient lights reflect off the reinforced doors leading to the mainframe compartment.",
-    "baseDC": 15,
-    "isMonitored": true,
-    "connections": ["employee_hallway_l2", "mainframe_doors", "lobby_vents"]
+    "BaseDC": 14,
+    "ConnectedRoomIDs": ["maintenance_room", "outside_exit"]
   },
   {
-    "roomId": "power_room",
-    "roomName": "Power Room",
-    "description": "Humming with electrical energy. Accessing systems here directly could control building subroutines.",
-    "baseDC": 10,
-    "isMonitored": false,
-    "connections": ["employee_hallway_l2", "power_room_vents"]
-  },
-  {
-    "roomId": "mainframe_doors",
-    "roomName": "Mainframe Door",
-    "description": "A heavy blast door securing the hospital's central mainframe chamber.",
-    "baseDC": 18,
-    "isMonitored": true,
-    "connections": ["employee_hallway_l3", "mainframe_room"]
-  },
-  {
-    "roomId": "mainframe_room",
-    "roomName": "Mainframe Room",
-    "description": "Rows of data racks contain private clinical and corporate secrets. The extraction computer is located here.",
-    "baseDC": 15,
-    "isMonitored": true,
-    "connections": ["mainframe_doors", "mainframe_room_vents"]
-  },
-  {
-    "roomId": "power_room_vents",
-    "roomName": "Power Room Vents",
-    "description": "A metallic airway situated over the active generators of the power complex.",
-    "baseDC": 10,
-    "isMonitored": false,
-    "connections": ["lobby_vents", "mainframe_room_vents", "power_room"]
-  },
-  {
-    "roomId": "mainframe_room_vents",
-    "roomName": "Mainframe Room Vents",
-    "description": "Vents tracking directly over the main core node consoles.",
-    "baseDC": 10,
-    "isMonitored": false,
-    "connections": ["lobby_vents", "mainframe_room", "maintenance_room_vents"]
-  },
-  {
-    "roomId": "maintenance_room_vents",
-    "roomName": "Maintenance Room Vents",
-    "description": "A humid shaft dropping into the facility maintenance areas.",
-    "baseDC": 10,
-    "isMonitored": false,
-    "connections": ["maintenance_room"]
-  },
-  {
-    "roomId": "maintenance_room",
-    "roomName": "Maintenance Room",
-    "description": "A damp facility room prone to leaking sewage and water systems.",
-    "baseDC": 10,
-    "isMonitored": false,
-    "connections": ["power_room"]
->>>>>>> 993e84fb50430dedc72f23580b65cf9526fa6fed
+    "RoomID": "outside_exit",
+    "Name": "Outside Exit",
+    "Description": "The perimeter gates leading to safety.",
+    "SecurityZone": "Unmonitored",
+    "IsVent": false,
+    "ConnectedRoomIDs": []
   }
 ]

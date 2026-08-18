@@ -1,69 +1,104 @@
 using System;
 using System.Collections.Generic;
 using System.Text.Json;
-<<<<<<< HEAD
 using CyberHeistAce.Models;
-using CyberHeistButuan.Engine;
-
-namespace CyberHeistAce.Engine
-{
-    public class NavigationManager
-=======
 using CyberHeistButuan.Models;
+using CyberHeistAce.UI;
 
 namespace CyberHeistButuan.Engine
 {
-    public class RoomNode
-    {
-        public string RoomId { get; set; } = string.Empty;
-        public string RoomName { get; set; } = string.Empty;
-        public string Description { get; set; } = string.Empty;
-        public int BaseDC { get; set; }
-        public bool IsMonitored { get; set; }
-        public List<string> Connections { get; set; } = new List<string>();
-    }
-
-    public class Nav_Manager
->>>>>>> 993e84fb50430dedc72f23580b65cf9526fa6fed
+    public class NavigationManager
     {
         public Dictionary<string, RoomNode> Rooms { get; private set; } = new Dictionary<string, RoomNode>();
         public RoomNode CurrentRoom { get; private set; } = new RoomNode();
+        public bool IsGameOver { get; private set; } = false;
+
+        /// <summary>
+        /// Decoupled DTO class to safely map Map.json property keys to the RoomNode domain model.
+        /// </summary>
+        private class RoomNodeDTO
+        {
+            public string RoomID { get; set; } = string.Empty;
+            public string Name { get; set; } = string.Empty;
+            public string Description { get; set; } = string.Empty;
+            public string SecurityZone { get; set; } = string.Empty;
+            public bool IsVent { get; set; }
+            public string CorrespondingRoomID { get; set; } = string.Empty;
+            public string HazardType { get; set; } = string.Empty;
+            public int BaseDC { get; set; }
+            public List<string> ConnectedRoomIDs { get; set; } = new List<string>();
+        }
 
         public void LoadMap(string jsonContent)
         {
             var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
-            var list = JsonSerializer.Deserialize<List<RoomNode>>(jsonContent, options);
+            var dtoList = JsonSerializer.Deserialize<List<RoomNodeDTO>>(jsonContent, options);
 
-            if (list != null)
+            Rooms.Clear();
+
+            if (dtoList != null)
             {
-                foreach (var room in list)
+                foreach (var dto in dtoList)
                 {
-<<<<<<< HEAD
-                    if (room.RoomId.EndsWith("_vents"))
+                    var domainNode = new RoomNode
                     {
-                        room.IsVent = true;
-                        room.CorrespondingRoomId = room.RoomId.Replace("_vents", "");
+                        RoomId = dto.RoomID,
+                        RoomName = dto.Name,
+                        Description = dto.Description,
+                        BaseDC = dto.BaseDC,
+                        IsMonitored = dto.SecurityZone == "Monitored" || dto.SecurityZone == "Patrolled",
+                        IsVent = dto.IsVent,
+                        CorrespondingRoomId = dto.CorrespondingRoomID,
+                        HazardType = dto.HazardType,
+                        Connections = dto.ConnectedRoomIDs ?? new List<string>()
+                    };
+
+                    // Auto-wire default drop-down properties based on naming convention
+                    if (domainNode.RoomId.EndsWith("_vents"))
+                    {
+                        domainNode.IsVent = true;
+                        domainNode.CorrespondingRoomId = domainNode.RoomId.Replace("_vents", "");
                     }
 
-                    // Manually tag hazards to match backend environment specs
-                    if (room.RoomId == "maintenance_room")
-                    {
-                        room.HazardType = "Moist";
-                    }
-
-=======
->>>>>>> 993e84fb50430dedc72f23580b65cf9526fa6fed
-                    Rooms[room.RoomId] = room;
+                    Rooms[domainNode.RoomId] = domainNode;
                 }
             }
 
-<<<<<<< HEAD
-=======
-            // Set standard starting point
->>>>>>> 993e84fb50430dedc72f23580b65cf9526fa6fed
+            EnsureRequiredPathways();
+
             if (Rooms.ContainsKey("outside"))
             {
                 CurrentRoom = Rooms["outside"];
+            }
+        }
+
+        /// <summary>
+        /// Automatically checks for and wires the required Ground Exit pathway.
+        /// </summary>
+        private void EnsureRequiredPathways()
+        {
+            // Register Outside Exit if not present in the map file
+            if (!Rooms.ContainsKey("outside_exit"))
+            {
+                Rooms["outside_exit"] = new RoomNode
+                {
+                    RoomId = "outside_exit",
+                    RoomName = "Outside Exit",
+                    Description = "The hospital perimeter gates. Beyond lies safety and freedom from security sweeps.",
+                    IsMonitored = false,
+                    IsVent = false,
+                    BaseDC = 10,
+                    Connections = new List<string> { "lobby" }
+                };
+            }
+
+            // Wire Lobby -> Outside Exit connection
+            if (Rooms.TryGetValue("lobby", out var lobby))
+            {
+                if (!lobby.Connections.Contains("outside_exit"))
+                {
+                    lobby.Connections.Add("outside_exit");
+                }
             }
         }
 
@@ -94,60 +129,12 @@ namespace CyberHeistButuan.Engine
 
         public bool RequiresSneakCheck(RoomNode target)
         {
-<<<<<<< HEAD
             return target.IsMonitored;
         }
 
-        /// <summary>
-        /// Evaluates, applies, and notifies the player of entry hazards or environmental clearances.
-        /// </summary>
-        public void HandleRoomEntryHazards(Player player)
-        {
-            // Evaluate 'Moist' (Squeaky Shoes) status from damp floors
-            if (CurrentRoom.HazardType == "Moist")
-            {
-                if (!player.IsMoist)
-                {
-                    player.IsMoist = true;
-                    Console.ForegroundColor = ConsoleColor.Red;
-                    Console.WriteLine("\n[HAZARD WARNING] The damp floor of the Maintenance Room drenches your shoes! Your steps squeak loudly. Stealth debuffed (-1 sneakPTS).");
-                    Console.ResetColor();
-                }
-            }
-            else
-            {
-                // Clear the squeak effect when leaving wet zones
-                if (player.IsMoist)
-                {
-                    player.IsMoist = false;
-                    Console.ForegroundColor = ConsoleColor.Green;
-                    Console.WriteLine("\n[HAZARD CLEARED] Your shoes dry up. Stealth penalty removed (+1 sneakPTS restored).");
-                    Console.ResetColor();
-                }
-            }
-
-            // Evaluate 'Hot' status
-            if (CurrentRoom.HazardType == "Hot")
-            {
-                if (!player.IsHot)
-                {
-                    player.IsHot = true;
-                    Console.ForegroundColor = ConsoleColor.Red;
-                    Console.WriteLine("\n[HAZARD WARNING] Escaping high-pressure steam rises your body temperature! Hot status active (HP will drain gradually).");
-                    Console.ResetColor();
-                }
-            }
-            else
-            {
-                if (player.IsHot)
-                {
-                    player.IsHot = false;
-                    Console.ForegroundColor = ConsoleColor.Green;
-                    Console.WriteLine("\n[HAZARD CLEARED] You step out of the hot zone. Thermal drain stopped.");
-                    Console.ResetColor();
-                }
-            }
-        }
+        // ==========================================
+        // Vent Interaction Mechanics
+        // ==========================================
 
         public bool CanDropDown(out string targetRoomName)
         {
@@ -174,56 +161,119 @@ namespace CyberHeistButuan.Engine
             return false;
         }
 
+        /// <summary>
+        /// Handles the dedicated navigation loop options when inside a Vent.
+        /// </summary>
+        public void HandleVentMenuLoop(Player player, Detection_System detectionSystem)
+        {
+            TerminalRenderer.PrintAmbient("\n=== VENT ACTION INTERFACE ===");
+            TerminalRenderer.PrintAmbient($"Location: {CurrentRoom.RoomName}");
+
+            string dropDownLabel = "Drop down into room below";
+            if (CanDropDown(out string targetName))
+            {
+                dropDownLabel = $"Drop down into [{targetName}]";
+            }
+
+            Console.WriteLine($" [1] {dropDownLabel}");
+            Console.WriteLine(" [2] Lay Low / Wait inside Vents (Passes 1 turn, cools down alert level)");
+
+            Console.Write("\nSelect action: ");
+            string choice = Console.ReadLine() ?? "";
+
+            switch (choice)
+            {
+                case "1":
+                    if (ExecuteDropDown())
+                    {
+                        TerminalRenderer.PrintSuccess($"\nYou dropped down out of the vents and entered: {CurrentRoom.RoomName}");
+                    }
+                    else
+                    {
+                        Console.WriteLine("There is no valid corresponding room below this ventilation duct.");
+                    }
+                    break;
+                case "2":
+                    WaitInVents(player, detectionSystem);
+                    break;
+                default:
+                    Console.WriteLine("Invalid input. Selection aborted.");
+                    break;
+            }
+        }
+
         public void WaitInVents(Player player, Detection_System detectionSystem)
         {
-            Console.WriteLine("\n[ACTION] You find a dark corner inside the vent shaft to lay low...");
+            TerminalRenderer.PrintAmbient("\nYou find a quiet alcove in the metal vents and lay low...");
             detectionSystem.ProcessTurn();
 
-            // Run check to stay silent inside ducts
+            // DC 10 Stealth check using player EffectiveSneakPTS
             var checkResult = Dice_Roller.RollD20(player.EffectiveSneakPTS, 10);
-            Console.ForegroundColor = ConsoleColor.Yellow;
-            Console.WriteLine($"[VENT COOLDOWN CHECK] (DC 10): D20 + {player.EffectiveSneakPTS} (Base Roll: {checkResult.BaseRoll}) = {checkResult.Total}");
-            Console.ResetColor();
+            TerminalRenderer.PrintRoll($"Stealth Cooldown Check (DC 10): D20 + {player.EffectiveSneakPTS} (Base Roll: {checkResult.BaseRoll}) = {checkResult.Total}");
 
             if (checkResult.IsSuccess)
             {
-                Console.ForegroundColor = ConsoleColor.Green;
-                Console.WriteLine("SUCCESS! You lay low quietly. Local security searches cool down.");
-                Console.ResetColor();
-
+                TerminalRenderer.PrintSuccess("SUCCESS! You remain dead quiet. Local security presence cools down.");
                 if (detectionSystem.CurrentState == DetectionState.Suspicious)
                 {
                     detectionSystem.ModifySuspiciousTimer(-1);
-                    Console.WriteLine($"Remaining Suspicious Turns: {detectionSystem.GetSuspiciousTurnsRemaining()}");
+                    Console.WriteLine($"Alert timer lowered. Turns remaining: {detectionSystem.GetSuspiciousTurnsRemaining()}");
                 }
             }
             else
             {
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine("\n[FAILURE] You shift your weight and slide against a loose bracket! Clank!");
-                Console.ResetColor();
-
+                TerminalRenderer.PrintAlarm("\nFAILURE! You brush against a loose metallic fitting! Clank!");
                 if (detectionSystem.CurrentState == DetectionState.Suspicious)
                 {
                     detectionSystem.ModifySuspiciousTimer(1);
-                    Console.ForegroundColor = ConsoleColor.Yellow;
-                    Console.WriteLine("ALERT: Local sound waves delayed your cooldown! Suspicious timer increased +1.");
-                    Console.WriteLine($"Remaining Suspicious Turns: {detectionSystem.GetSuspiciousTurnsRemaining()}");
-                    Console.ResetColor();
+                    TerminalRenderer.PrintAlarm($"Local security sweeps extend! Suspicious timer increased. Turns remaining: {detectionSystem.GetSuspiciousTurnsRemaining()}");
                 }
                 else if (detectionSystem.CurrentState == DetectionState.Undetected)
                 {
                     detectionSystem.SetState(DetectionState.Suspicious);
-                    Console.ForegroundColor = ConsoleColor.Yellow;
-                    Console.WriteLine("ALERT: Sound echoes through the ducts! Security status set to SUSPICIOUS.");
-                    Console.ResetColor();
+                    TerminalRenderer.PrintAlarm("ALERT: Patrols heard a sound! Security alert level escalated to SUSPICIOUS.");
                 }
             }
         }
-=======
-            // Zone-Based Approach: Patrolled / High-Security Areas require D20 check
-            return target.IsMonitored;
+
+        // ==========================================
+        // Ground Win Condition Hook
+        // ==========================================
+
+        /// <summary>
+        /// Checks if the player has entered the ground escape zone.
+        /// </summary>
+        public void CheckGroundEscapeTrigger(Player player, Detection_System detectionSystem, int totalTurns)
+        {
+            if (CurrentRoom.RoomId == "outside_exit")
+            {
+                ExecuteGroundEscape(player, detectionSystem, totalTurns);
+            }
         }
->>>>>>> 993e84fb50430dedc72f23580b65cf9526fa6fed
+
+        private void ExecuteGroundEscape(Player player, Detection_System detectionSystem, int totalTurns)
+        {
+            IsGameOver = true;
+
+            TerminalRenderer.PrintSuccess("\n=======================================================");
+            TerminalRenderer.PrintSuccess("           GROUND LEVEL EXFILTRATION SUCCESS           ");
+            TerminalRenderer.PrintSuccess("=======================================================");
+            TerminalRenderer.PrintAmbient("You slip past the perimeter security gate of ACE Hospital, dissolving into the rain.");
+            TerminalRenderer.PrintAmbient("Before alarms lock down the surrounding blocks, you vanish into the streets.");
+
+            TerminalRenderer.PrintSuccess("\n--- CYBER HEIST ACE MISSION SUMMARY ---");
+            TerminalRenderer.PrintAmbient($"Hacker Name: {player.Name}");
+            TerminalRenderer.PrintAmbient($"Exfiltration Route: Ground Level Escape Corridor");
+            TerminalRenderer.PrintAmbient($"Total Turns Spent: {totalTurns}");
+            
+            double damageSustained = player.MaxHP - player.CurrentHP;
+            TerminalRenderer.PrintAmbient($"Vitals Lost: {damageSustained} HP");
+            
+            TerminalRenderer.PrintAmbient("\nYou successfully escape into the dark alleys with the hospital's private medical secrets.");
+            TerminalRenderer.PrintSuccess("----------------------------------------");
+            
+            TerminalRenderer.PrintAmbient("\nPress any key to exit the system simulation...");
+            Console.ReadKey(true);
+        }
     }
 }

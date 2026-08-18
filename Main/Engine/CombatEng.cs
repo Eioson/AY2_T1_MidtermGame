@@ -1,8 +1,5 @@
 using System;
-<<<<<<< HEAD
 using CyberHeistAce.Models;
-=======
->>>>>>> 993e84fb50430dedc72f23580b65cf9526fa6fed
 using CyberHeistButuan.Models;
 
 namespace CyberHeistButuan.Engine

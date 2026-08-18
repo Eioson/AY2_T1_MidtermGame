@@ -1,21 +1,11 @@
 using System;
 using System.Collections.Generic;
-<<<<<<< HEAD
-using CyberHeistButuan.Models;
-
-namespace CyberHeistAce.Models
-{
-    public class Player
-    {
-        public string Name { get; set; } = "Hacker";
-=======
 
 namespace CyberHeistButuan.Models
 {
     public class Player
     {
         public string Name { get; set; } = "Netrunner";
->>>>>>> 993e84fb50430dedc72f23580b65cf9526fa6fed
         public int MaxHP { get; set; } = 20;
         public double CurrentHP { get; set; } = 20;
         
@@ -24,29 +14,10 @@ namespace CyberHeistButuan.Models
         public int SneakPTS { get; set; } = 1;
         public int FightPTS { get; set; } = 1;
 
-<<<<<<< HEAD
-        // Status Effects
-        public bool IsMoist { get; set; } = false; // Inflicts squeaky shoes stealth penalty
-        public bool IsHot { get; set; } = false;   // Inflicts gradual HP loss
-
-        // Turn counters for environmental cycles
-        private int _hotTurnsCount = 0;
-
-        /// <summary>
-        /// Returns the sneaker's stealth modifier after calculating active status penalties.
-        /// </summary>
-        public int EffectiveSneakPTS => IsMoist ? Math.Max(1, SneakPTS - 1) : SneakPTS;
-
         // Inventory system (Capped at 2 snacks)
         public List<Item> Inventory { get; set; } = new List<Item>();
         public const int MaxInventorySize = 2;
 
-=======
-        // Inventory system (Capped at 2 snacks)
-        public List<Item> Inventory { get; set; } = new List<Item>();
-        public const int MaxInventorySize = 2;
-
->>>>>>> 993e84fb50430dedc72f23580b65cf9526fa6fed
         public void AllocatePoints()
         {
             int totalPoints = 10;
@@ -119,40 +90,6 @@ namespace CyberHeistButuan.Models
             Inventory.Add(item);
             Console.WriteLine($"Stowed {item.Name} in your inventory.");
             return true;
-<<<<<<< HEAD
-        }
-
-        /// <summary>
-        /// Evaluates active environmental damage cycles.
-        /// </summary>
-        public void ApplyTurnHazards()
-        {
-            if (IsHot)
-            {
-                _hotTurnsCount++;
-                // Drains 1 HP every 2 turns (representing the 0.5 HP loss per turn rate)
-                if (_hotTurnsCount % 2 == 0)
-                {
-                    CurrentHP = Math.Max(0, CurrentHP - 1);
-                    Console.ForegroundColor = ConsoleColor.Red;
-                    Console.WriteLine($"\n[HAZARD ALARM] Blistering heat from steam vents drains your vitals! You lost 1 HP. (Current HP: {CurrentHP}/{MaxHP})");
-                    Console.ResetColor();
-
-                    if (CurrentHP <= 0)
-                    {
-                        Console.ForegroundColor = ConsoleColor.Red;
-                        Console.WriteLine("\n[PERMADEATH] You collapsed from heat exhaustion. GAME OVER.");
-                        Console.ResetColor();
-                        Environment.Exit(0);
-                    }
-                }
-            }
-            else
-            {
-                _hotTurnsCount = 0; // Reset counter when exiting hot zones
-            }
-=======
->>>>>>> 993e84fb50430dedc72f23580b65cf9526fa6fed
         }
     }
 }

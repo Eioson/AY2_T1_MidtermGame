@@ -2,13 +2,7 @@
 using System.IO;
 using CyberHeistButuan.Models;
 using CyberHeistButuan.Engine;
-<<<<<<< HEAD
-using CyberHeistAce.Engine;
-using CyberHeistAce.UI;
-using CyberHeistAce.Models;
-=======
 using CyberHeistButuan.UI;
->>>>>>> 993e84fb50430dedc72f23580b65cf9526fa6fed
 
 namespace CyberHeistButuan
 {
@@ -17,15 +11,9 @@ namespace CyberHeistButuan
         static void Main(string[] args)
         {
             Console.Clear();
-<<<<<<< HEAD
-            AsciiArt.DisplayTitleBanner();
-
-            TerminalRenderer.PrintAmbient("System initialization sequence online. Connecting to local server networks...", true);
-=======
             ASCII_Art.DisplayTitleBanner();
 
             Terminal_Render.PrintAmbient("System initialization sequence online. Connecting to local server networks...", true);
->>>>>>> 993e84fb50430dedc72f23580b65cf9526fa6fed
 
             // Establish Player profile
             Player player = new Player();
@@ -36,11 +24,7 @@ namespace CyberHeistButuan
             player.AddItem(new Item("Chiba heavy energy paste", ItemType.HeavySnack));
 
             Detection_System detectionSystem = new Detection_System();
-<<<<<<< HEAD
-            NavigationManager nav = new NavigationManager();
-=======
             Nav_Manager nav = new Nav_Manager();
->>>>>>> 993e84fb50430dedc72f23580b65cf9526fa6fed
 
             // Attempt file layout loading, with string fallback setup if missing
             string jsonContent = "";
@@ -56,11 +40,7 @@ namespace CyberHeistButuan
             nav.LoadMap(jsonContent);
             CombatEngine combat = new CombatEngine(player, detectionSystem);
 
-<<<<<<< HEAD
-            TerminalRenderer.PrintAmbient("\nInitialization completed. Press any key to deploy to Outside area...", false);
-=======
             Terminal_Render.PrintAmbient("\nInitialization completed. Press any key to deploy to Outside area...", false);
->>>>>>> 993e84fb50430dedc72f23580b65cf9526fa6fed
             Console.ReadKey(true);
 
             bool heistRunning = true;
@@ -69,11 +49,7 @@ namespace CyberHeistButuan
             while (heistRunning)
             {
                 Console.Clear();
-<<<<<<< HEAD
-                AsciiArt.DisplayHospitalMap();
-=======
                 ASCII_Art.DisplayHospitalMap();
->>>>>>> 993e84fb50430dedc72f23580b65cf9526fa6fed
                 RenderStatusHUD(player, detectionSystem, nav, dataExtracted);
 
                 // Run tactical engagement checks if transition triggers combat
@@ -83,11 +59,7 @@ namespace CyberHeistButuan
                     while (detectionSystem.CurrentState == DetectionState.In_Encounter)
                     {
                         Console.Clear();
-<<<<<<< HEAD
-                        TerminalRenderer.PrintAlarm("=================== DIRECT COMBAT REGISTERED ===================");
-=======
                         Terminal_Render.PrintAlarm("=================== DIRECT COMBAT REGISTERED ===================");
->>>>>>> 993e84fb50430dedc72f23580b65cf9526fa6fed
                         Console.WriteLine($"Guards deployed: {combat.GuardCount} | Total Stack HP: {combat.GuardHP}");
                         Console.WriteLine($"Your HP status: {player.CurrentHP}/{player.MaxHP}");
                         Console.WriteLine("\nCombat action selections:");
@@ -102,11 +74,7 @@ namespace CyberHeistButuan
 
                         if (escaped)
                         {
-<<<<<<< HEAD
-                            TerminalRenderer.PrintSuccess("\nEscaped direct engagement. Repositioning...");
-=======
                             Terminal_Render.PrintSuccess("\nEscaped direct engagement. Repositioning...");
->>>>>>> 993e84fb50430dedc72f23580b65cf9526fa6fed
                             Console.ReadKey(true);
                             break;
                         }
@@ -119,11 +87,7 @@ namespace CyberHeistButuan
                 // Standard Exploration phase
                 var options = nav.GetConnections();
                 Console.WriteLine($"\n[LOCATION] {nav.CurrentRoom.RoomName}");
-<<<<<<< HEAD
-                TerminalRenderer.PrintAmbient(nav.CurrentRoom.Description);
-=======
                 Terminal_Render.PrintAmbient(nav.CurrentRoom.Description);
->>>>>>> 993e84fb50430dedc72f23580b65cf9526fa6fed
 
                 // Mainframe terminal interface
                 if (nav.CurrentRoom.RoomId == "mainframe_room" && !dataExtracted)
@@ -148,37 +112,22 @@ namespace CyberHeistButuan
                 if (entryChoice.Equals("Q", StringComparison.OrdinalIgnoreCase))
                 {
                     heistRunning = false;
-<<<<<<< HEAD
-                    TerminalRenderer.PrintAmbient("Exiting system connection. Heist aborted.", true);
-=======
                     Terminal_Render.PrintAmbient("Exiting system connection. Heist aborted.", true);
->>>>>>> 993e84fb50430dedc72f23580b65cf9526fa6fed
                     break;
                 }
 
                 if (entryChoice.Equals("H", StringComparison.OrdinalIgnoreCase) && nav.CurrentRoom.RoomId == "mainframe_room" && !dataExtracted)
                 {
                     var roll = Dice_Roller.RollD20(player.HackPTS, 15);
-<<<<<<< HEAD
-                    TerminalRenderer.PrintRoll($"\nHacking Server Decryption (DC 15): D20 + {player.HackPTS} (Roll: {roll.BaseRoll}) = {roll.Total}");
-                    if (roll.IsSuccess)
-                    {
-                        TerminalRenderer.PrintSuccess("PASS! Decryption protocols cracked. Data core copied successfully.");
-=======
                     Terminal_Render.PrintRoll($"\nHacking Server Decryption (DC 15): D20 + {player.HackPTS} (Roll: {roll.BaseRoll}) = {roll.Total}");
                     if (roll.IsSuccess)
                     {
                         Terminal_Render.PrintSuccess("PASS! Decryption protocols cracked. Data core copied successfully.");
->>>>>>> 993e84fb50430dedc72f23580b65cf9526fa6fed
                         dataExtracted = true;
                     }
                     else
                     {
-<<<<<<< HEAD
-                        TerminalRenderer.PrintAlarm("FAIL! Server firewall issues detected. Alarm alert levels rising!");
-=======
                         Terminal_Render.PrintAlarm("FAIL! Server firewall issues detected. Alarm alert levels rising!");
->>>>>>> 993e84fb50430dedc72f23580b65cf9526fa6fed
                         detectionSystem.RecordCheckResult(false);
                     }
                     Console.ReadKey(true);
@@ -191,15 +140,6 @@ namespace CyberHeistButuan
 
                     if (nav.RequiresSneakCheck(targetDestination))
                     {
-<<<<<<< HEAD
-                        TerminalRenderer.PrintAmbient($"\nAttempting silent entry into {targetDestination.RoomName}...", false);
-                        var check = Dice_Roller.RollD20(player.SneakPTS, targetDestination.BaseDC);
-                        TerminalRenderer.PrintRoll($"Stealth Check (DC {targetDestination.BaseDC}): D20 + {player.SneakPTS} (Roll: {check.BaseRoll}) = {check.Total}");
-
-                        if (check.IsSuccess)
-                        {
-                            TerminalRenderer.PrintSuccess("PASS! Slipped through security monitors cleanly.");
-=======
                         Terminal_Render.PrintAmbient($"\nAttempting silent entry into {targetDestination.RoomName}...", false);
                         var check = Dice_Roller.RollD20(player.SneakPTS, targetDestination.BaseDC);
                         Terminal_Render.PrintRoll($"Stealth Check (DC {targetDestination.BaseDC}): D20 + {player.SneakPTS} (Roll: {check.BaseRoll}) = {check.Total}");
@@ -207,17 +147,12 @@ namespace CyberHeistButuan
                         if (check.IsSuccess)
                         {
                             Terminal_Render.PrintSuccess("PASS! Slipped through security monitors cleanly.");
->>>>>>> 993e84fb50430dedc72f23580b65cf9526fa6fed
                             detectionSystem.RecordCheckResult(true);
                             nav.MoveTo(targetDestination.RoomId);
                         }
                         else
                         {
-<<<<<<< HEAD
-                            TerminalRenderer.PrintAlarm("FAIL! Motion alarms triggered by the checkpoint monitors.");
-=======
                             Terminal_Render.PrintAlarm("FAIL! Motion alarms triggered by the checkpoint monitors.");
->>>>>>> 993e84fb50430dedc72f23580b65cf9526fa6fed
                             detectionSystem.RecordCheckResult(false);
                             nav.MoveTo(targetDestination.RoomId);
                         }
@@ -225,11 +160,7 @@ namespace CyberHeistButuan
                     else
                     {
                         nav.MoveTo(targetDestination.RoomId);
-<<<<<<< HEAD
-                        TerminalRenderer.PrintAmbient($"\nMoved quietly into {targetDestination.RoomName}.");
-=======
                         Terminal_Render.PrintAmbient($"\nMoved quietly into {targetDestination.RoomName}.");
->>>>>>> 993e84fb50430dedc72f23580b65cf9526fa6fed
                     }
 
                     detectionSystem.ProcessTurn();
@@ -245,29 +176,17 @@ namespace CyberHeistButuan
                 if (nav.CurrentRoom.RoomId == "outside" && dataExtracted)
                 {
                     Console.Clear();
-<<<<<<< HEAD
-                    AsciiArt.DisplayTitleBanner();
-                    TerminalRenderer.PrintSuccess("\n========================================================");
-                    TerminalRenderer.PrintSuccess("   MISSION COMPLETE! EXTRACTION ARCHIVED SUCCESSFULLY!");
-                    TerminalRenderer.PrintSuccess("========================================================");
-                    TerminalRenderer.PrintAmbient("You successfully escape into the dark alleys of Butuan City with the hospital's private medical secrets.", true);
-=======
                     ASCII_Art.DisplayTitleBanner();
                     Terminal_Render.PrintSuccess("\n========================================================");
                     Terminal_Render.PrintSuccess("   MISSION COMPLETE! EXTRACTION ARCHIVED SUCCESSFULLY!");
                     Terminal_Render.PrintSuccess("========================================================");
                     Terminal_Render.PrintAmbient("You successfully escape into the dark alleys of Butuan City with the hospital's private medical secrets.", true);
->>>>>>> 993e84fb50430dedc72f23580b65cf9526fa6fed
                     heistRunning = false;
                 }
             }
         }
 
-<<<<<<< HEAD
-        private static void RenderStatusHUD(Player p, Detection_System ds, NavigationManager nav, bool gotData)
-=======
         private static void RenderStatusHUD(Player p, Detection_System ds, Nav_Manager nav, bool gotData)
->>>>>>> 993e84fb50430dedc72f23580b65cf9526fa6fed
         {
             Console.WriteLine("================================================================================");
             Console.Write($"HP: {p.CurrentHP}/{p.MaxHP} | hackPTS: +{p.HackPTS} | sneakPTS: +{p.SneakPTS} | fightPTS: +{p.FightPTS}");
