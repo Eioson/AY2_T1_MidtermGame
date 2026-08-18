@@ -1,12 +1,30 @@
 using System;
 using System.Collections.Generic;
 using System.Text.Json;
+<<<<<<< HEAD
 using CyberHeistAce.Models;
 using CyberHeistButuan.Engine;
 
 namespace CyberHeistAce.Engine
 {
     public class NavigationManager
+=======
+using CyberHeistButuan.Models;
+
+namespace CyberHeistButuan.Engine
+{
+    public class RoomNode
+    {
+        public string RoomId { get; set; } = string.Empty;
+        public string RoomName { get; set; } = string.Empty;
+        public string Description { get; set; } = string.Empty;
+        public int BaseDC { get; set; }
+        public bool IsMonitored { get; set; }
+        public List<string> Connections { get; set; } = new List<string>();
+    }
+
+    public class Nav_Manager
+>>>>>>> 993e84fb50430dedc72f23580b65cf9526fa6fed
     {
         public Dictionary<string, RoomNode> Rooms { get; private set; } = new Dictionary<string, RoomNode>();
         public RoomNode CurrentRoom { get; private set; } = new RoomNode();
@@ -20,6 +38,7 @@ namespace CyberHeistAce.Engine
             {
                 foreach (var room in list)
                 {
+<<<<<<< HEAD
                     if (room.RoomId.EndsWith("_vents"))
                     {
                         room.IsVent = true;
@@ -32,10 +51,16 @@ namespace CyberHeistAce.Engine
                         room.HazardType = "Moist";
                     }
 
+=======
+>>>>>>> 993e84fb50430dedc72f23580b65cf9526fa6fed
                     Rooms[room.RoomId] = room;
                 }
             }
 
+<<<<<<< HEAD
+=======
+            // Set standard starting point
+>>>>>>> 993e84fb50430dedc72f23580b65cf9526fa6fed
             if (Rooms.ContainsKey("outside"))
             {
                 CurrentRoom = Rooms["outside"];
@@ -69,6 +94,7 @@ namespace CyberHeistAce.Engine
 
         public bool RequiresSneakCheck(RoomNode target)
         {
+<<<<<<< HEAD
             return target.IsMonitored;
         }
 
@@ -194,5 +220,10 @@ namespace CyberHeistAce.Engine
                 }
             }
         }
+=======
+            // Zone-Based Approach: Patrolled / High-Security Areas require D20 check
+            return target.IsMonitored;
+        }
+>>>>>>> 993e84fb50430dedc72f23580b65cf9526fa6fed
     }
 }

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+<<<<<<< HEAD
 using CyberHeistButuan.Models;
 
 namespace CyberHeistAce.Models
@@ -7,6 +8,14 @@ namespace CyberHeistAce.Models
     public class Player
     {
         public string Name { get; set; } = "Hacker";
+=======
+
+namespace CyberHeistButuan.Models
+{
+    public class Player
+    {
+        public string Name { get; set; } = "Netrunner";
+>>>>>>> 993e84fb50430dedc72f23580b65cf9526fa6fed
         public int MaxHP { get; set; } = 20;
         public double CurrentHP { get; set; } = 20;
         
@@ -15,6 +24,7 @@ namespace CyberHeistAce.Models
         public int SneakPTS { get; set; } = 1;
         public int FightPTS { get; set; } = 1;
 
+<<<<<<< HEAD
         // Status Effects
         public bool IsMoist { get; set; } = false; // Inflicts squeaky shoes stealth penalty
         public bool IsHot { get; set; } = false;   // Inflicts gradual HP loss
@@ -31,6 +41,12 @@ namespace CyberHeistAce.Models
         public List<Item> Inventory { get; set; } = new List<Item>();
         public const int MaxInventorySize = 2;
 
+=======
+        // Inventory system (Capped at 2 snacks)
+        public List<Item> Inventory { get; set; } = new List<Item>();
+        public const int MaxInventorySize = 2;
+
+>>>>>>> 993e84fb50430dedc72f23580b65cf9526fa6fed
         public void AllocatePoints()
         {
             int totalPoints = 10;
@@ -103,6 +119,7 @@ namespace CyberHeistAce.Models
             Inventory.Add(item);
             Console.WriteLine($"Stowed {item.Name} in your inventory.");
             return true;
+<<<<<<< HEAD
         }
 
         /// <summary>
@@ -134,6 +151,8 @@ namespace CyberHeistAce.Models
             {
                 _hotTurnsCount = 0; // Reset counter when exiting hot zones
             }
+=======
+>>>>>>> 993e84fb50430dedc72f23580b65cf9526fa6fed
         }
     }
 }
