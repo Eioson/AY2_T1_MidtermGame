@@ -5,14 +5,24 @@ namespace CyberHeistButuan.Models
 {
     public class Player
     {
-        public string Name { get; set; } = "Netrunner";
+        public string Name { get; set; } = "Hacker";
         public int MaxHP { get; set; } = 20;
         public double CurrentHP { get; set; } = 20;
         
         // Base stats
         public int HackPTS { get; set; } = 1;
-        public int SneakPTS { get; set; } = 1;
+
+        private int _sneakPTS = 1;
+        public int SneakPTS
+        {
+            get => IsMoist ? Math.Max(1, _sneakPTS - 2) : _sneakPTS;
+            set => _sneakPTS = value;
+        }
+
         public int FightPTS { get; set; } = 1;
+
+        // Status Effects
+        public bool IsMoist { get; set; } = false;
 
         // Inventory system (Capped at 2 snacks)
         public List<Item> Inventory { get; set; } = new List<Item>();

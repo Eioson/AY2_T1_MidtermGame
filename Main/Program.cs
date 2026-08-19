@@ -122,7 +122,7 @@ namespace CyberHeistButuan
                 bool isInVents = nav.CurrentRoom.RoomId.EndsWith("vents", StringComparison.OrdinalIgnoreCase);
                 if (isInVents)
                 {
-                    Console.ForegroundColor = ConsoleColor.Blue; // Blue but not blue, more like 
+                    Console.ForegroundColor = ConsoleColor.Cyan;
                     Console.WriteLine(" [W] Wait quietly in the vents (Pass turn)");
                     Console.ResetColor();
                 }
@@ -178,18 +178,18 @@ namespace CyberHeistButuan
                         {
                             Terminal_Render.PrintSuccess("PASS! Slipped through security monitors cleanly.");
                             detectionSystem.RecordCheckResult(true);
-                            nav.MoveTo(targetDestination.RoomId);
+                            nav.MoveTo(targetDestination.RoomId, player); // Passed player
                         }
                         else
                         {
                             Terminal_Render.PrintAlarm("FAIL! Motion alarms triggered by the checkpoint monitors.");
                             detectionSystem.RecordCheckResult(false);
-                            nav.MoveTo(targetDestination.RoomId);
+                            nav.MoveTo(targetDestination.RoomId, player); // Passed player
                         }
                     }
                     else
                     {
-                        nav.MoveTo(targetDestination.RoomId);
+                        nav.MoveTo(targetDestination.RoomId, player); // Passed player
                         Terminal_Render.PrintAmbient($"\nMoved quietly into {targetDestination.RoomName}.");
                     }
 
@@ -220,6 +220,15 @@ namespace CyberHeistButuan
         {
             Console.WriteLine("================================================================================");
             Console.Write($"HP: {p.CurrentHP}/{p.MaxHP} | hackPTS: +{p.HackPTS} | sneakPTS: +{p.SneakPTS} | fightPTS: +{p.FightPTS}");
+            
+            if (p.IsMoist)
+            {
+                Console.Write(" | ");
+                Console.ForegroundColor = ConsoleColor.Yellow;
+                Console.Write("[STATUS: MOIST]");
+                Console.ResetColor();
+            }
+
             Console.Write($" | Data Drive: {(gotData ? "SECURED" : "MISSING")}\n");
 
             Console.Write("Alert Level: ");

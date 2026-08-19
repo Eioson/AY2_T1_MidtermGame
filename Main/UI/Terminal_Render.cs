@@ -46,5 +46,18 @@ namespace CyberHeistButuan.UI
             else Console.WriteLine(text);
             Console.ResetColor();
         }
+
+        public static void PrintStatusWarning(string title, string message)
+        {
+            Console.ForegroundColor = ConsoleColor.DarkYellow;
+            Console.WriteLine("\n================================================================================================");
+            Console.WriteLine($"\t[ALERT]  {title.ToUpper()}  [ALERT]");
+            Console.WriteLine("==================================================================================================");
+            Console.ForegroundColor = ConsoleColor.Yellow;
+            Console.WriteLine(message);
+            Console.ForegroundColor = ConsoleColor.DarkYellow;
+            Console.WriteLine("==================================================================================================");
+            Console.ResetColor();
+        }
     }
 }
