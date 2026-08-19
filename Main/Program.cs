@@ -118,6 +118,15 @@ namespace CyberHeistButuan
                 }
                 Console.WriteLine(" [Q] Abort mission (Quit)");
 
+                // Show option to wait if inside vents
+                bool isInVents = nav.CurrentRoom.RoomId.EndsWith("vents", StringComparison.OrdinalIgnoreCase);
+                if (isInVents)
+                {
+                    Console.ForegroundColor = ConsoleColor.Blue; // Blue but not blue, more like 
+                    Console.WriteLine(" [W] Wait quietly in the vents (Pass turn)");
+                    Console.ResetColor();
+                }
+
                 Console.Write("\nChoose path: ");
                 string entryChoice = Console.ReadLine() ?? "";
 
@@ -126,6 +135,15 @@ namespace CyberHeistButuan
                     heistRunning = false;
                     Terminal_Render.PrintAmbient("Exiting system connection. Heist aborted.", true);
                     break;
+                }
+
+                // Handle waiting in the vents
+                if (entryChoice.Equals("W", StringComparison.OrdinalIgnoreCase) && isInVents)
+                {
+                    Terminal_Render.PrintAmbient("\nYou wait quietly in the dark vents, letting time pass...");
+                    detectionSystem.ProcessTurn();
+                    Console.ReadKey(true);
+                    continue;
                 }
 
                 if (entryChoice.Equals("H", StringComparison.OrdinalIgnoreCase) && nav.CurrentRoom.RoomId == "mainframe_room" && !dataExtracted)
