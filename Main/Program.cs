@@ -101,8 +101,20 @@ namespace CyberHeistButuan
                 for (int i = 0; i < options.Count; i++)
                 {
                     var destination = options[i];
-                    string details = destination.IsMonitored ? $"[MONITORED - DC {destination.BaseDC}]" : "[UNMONITORED]";
-                    Console.WriteLine($" [{i + 1}] Move to {destination.RoomName} {details}");
+                    Console.Write($" [{i + 1}] Move to {destination.RoomName} ");
+
+                    // Temporarily set foreground to yellow for the monitored status text
+                    Console.ForegroundColor = ConsoleColor.Yellow;
+                    if (destination.IsMonitored)
+                    {
+                        Console.Write($"[MONITORED - DC {destination.BaseDC}]");
+                    }
+                    else
+                    {
+                        Console.Write("[UNMONITORED]");
+                    }
+                    Console.ResetColor();
+                    Console.WriteLine();
                 }
                 Console.WriteLine(" [Q] Abort mission (Quit)");
 
