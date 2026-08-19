@@ -39,6 +39,7 @@ namespace CyberHeistButuan
 
             nav.LoadMap(jsonContent);
             CombatEngine combat = new CombatEngine(player, detectionSystem);
+            ExfiltrationEngine exfil = new ExfiltrationEngine(player, detectionSystem, combat);
 
             Terminal_Render.PrintAmbient("\nInitialization completed. Press any key to deploy to Outside area...", false);
             Console.ReadKey(true);
@@ -70,6 +71,7 @@ namespace CyberHeistButuan
 
                         Console.Write("\nInput action choice: ");
                         string option = Console.ReadLine() ?? "";
+                        player.TotalTurns++;
                         bool escaped = combat.ProcessCombatTurn(option);
 
                         if (escaped)
@@ -97,24 +99,103 @@ namespace CyberHeistButuan
                     Console.ResetColor();
                 }
 
-                Console.WriteLine("\nPaths available:");
-                for (int i = 0; i < options.Count; i++)
+                // Helipad exfiltration choices
+                if (nav.CurrentRoom.RoomId == "rooftop_helipad")
                 {
-                    var destination = options[i];
-                    Console.Write($" [{i + 1}] Move to {destination.RoomName} ");
+                    if (!exfil.IsBeaconSignaled)
+                    {
+                        if (dataExtracted)
+                        {
+                            Console.ForegroundColor = ConsoleColor.Green;
+                            Console.WriteLine("\n[EXFIL ACTION] [S] Hack Helipad Beacon and call extraction chopper");
+                            Console.ResetColor();
+                        }
+                        else
+                        {
+                            Console.ForegroundColor = ConsoleColor.DarkGray;
+                            Console.WriteLine("\n[EXFIL LOCKED] [S] Hack Helipad Beacon (Retrieve Data Core first)");
+                            Console.ResetColor();
+                        }
+                    }
+                    else if (exfil.IsChopperArrived)
+                    {
+                        if (dataExtracted)
+                        {
+                            Console.ForegroundColor = ConsoleColor.Green;
+                            Console.WriteLine("\n[EXFIL ACTION] [B] Board helicopter and escape Butuan City!");
+                            Console.ResetColor();
+                        }
+                        else
+                        {
+                            Console.ForegroundColor = ConsoleColor.DarkGray;
+                            Console.WriteLine("\n[EXFIL LOCKED] [B] Board helicopter (Retrieve Data Core first)");
+                            Console.ResetColor();
+                        }
+                    }
+                }
 
-                    // Temporarily set foreground to yellow for the monitored status text
-                    Console.ForegroundColor = ConsoleColor.Yellow;
-                    if (destination.IsMonitored)
+                bool insideVents = nav.CurrentRoom.RoomId.Contains("vent", StringComparison.OrdinalIgnoreCase);
+
+                if (insideVents)
+                {
+                    var (ventShafts, dropDownRooms) = nav.GetVentNavigationOptions();
+
+                    Console.WriteLine("\n--- VENT SHAFT NAVIGATION SYSTEM ---\n");
+                    
+                    Console.WriteLine("Crawl to connected vents:\n");
+                    for (int i = 0; i < ventShafts.Count; i++)
                     {
-                        Console.Write($"[MONITORED - DC {destination.BaseDC}]");
+                        var destination = ventShafts[i];
+                        string details = destination.IsMonitored ? $"[MONITORED - DC {destination.BaseDC}]" : "[UNMONITORED]";
+                        Console.Write($" [{i + 1}] Crawl to {destination.RoomName} ");
+                        Console.ForegroundColor = ConsoleColor.Yellow;
+                        Console.Write(details);
+                        Console.ResetColor();
+                        Console.WriteLine();
                     }
-                    else
+
+                    Console.WriteLine("\nDrop down:\n");
+                    for (int i = 0; i < dropDownRooms.Count; i++)
                     {
-                        Console.Write("[UNMONITORED]");
+                        int choiceNumber = ventShafts.Count + i + 1;
+                        var destination = dropDownRooms[i];
+                        string details = destination.IsMonitored ? $"[MONITORED - DC {destination.BaseDC}]" : "[UNMONITORED]";
+                        if (destination.RoomId == "rooftop_helipad" && !dataExtracted)
+                        {
+                            details = "[LOCKED - RETRIEVE DATA CORE FIRST]";
+                        }
+                        if (destination.RoomId == "rooftop_helipad" && exfil.IsBeaconSignaled && !exfil.IsChopperArrived)
+                        {
+                            details = $"[LOCKED - CHOPPER ETA: {exfil.ChopperETA} turn(s)]";
+                        }
+                        Console.Write($" [{choiceNumber}] Drop down into {destination.RoomName} ");
+                        Console.ForegroundColor = ConsoleColor.Yellow;
+                        Console.Write(details);
+                        Console.ResetColor();
+                        Console.WriteLine();
                     }
-                    Console.ResetColor();
-                    Console.WriteLine();
+                }
+                else
+                {
+                    Console.WriteLine("\nPaths available:");
+                    for (int i = 0; i < options.Count; i++)
+                    {
+                        var destination = options[i];
+                        Console.Write($" [{i + 1}] Move to {destination.RoomName} ");
+
+                        // Temporarily set foreground to yellow for the monitored status text
+                        Console.ForegroundColor = ConsoleColor.Yellow;
+                        if (destination.IsMonitored)
+                        {
+                            Console.Write($"[MONITORED - DC {destination.BaseDC}]");
+                        }
+                        else
+                        {
+                            Console.Write("[UNMONITORED]");
+                        }
+                        Console.ResetColor();
+                        Console.WriteLine();
+                    }
                 }
                 Console.WriteLine(" [Q] Abort mission (Quit)");
 
@@ -137,17 +218,35 @@ namespace CyberHeistButuan
                     break;
                 }
 
+                // Handle exfiltration triggers
+                if (entryChoice.Equals("S", StringComparison.OrdinalIgnoreCase) && nav.CurrentRoom.RoomId == "rooftop_helipad" && !exfil.IsBeaconSignaled && dataExtracted)
+                {
+                    player.TotalTurns++;
+                    exfil.AttemptSignal();
+                    continue;
+                }
+
+                if (entryChoice.Equals("B", StringComparison.OrdinalIgnoreCase) && nav.CurrentRoom.RoomId == "rooftop_helipad" && exfil.IsChopperArrived && dataExtracted)
+                {
+                    exfil.TriggerVictoryExfiltration();
+                    heistRunning = false;
+                    break;
+                }
+
                 // Handle waiting in the vents
                 if (entryChoice.Equals("W", StringComparison.OrdinalIgnoreCase) && isInVents)
-                {
+                {   
                     Terminal_Render.PrintAmbient("\nYou wait quietly in the dark vents, letting time pass...");
+                    player.TotalTurns++;
                     detectionSystem.ProcessTurn();
+                    exfil.ProcessHelipadTurn();
                     Console.ReadKey(true);
                     continue;
                 }
 
                 if (entryChoice.Equals("H", StringComparison.OrdinalIgnoreCase) && nav.CurrentRoom.RoomId == "mainframe_room" && !dataExtracted)
                 {
+                    player.TotalTurns++;
                     var roll = Dice_Roller.RollD20(player.HackPTS, 15);
                     Terminal_Render.PrintRoll($"\nHacking Server Decryption (DC 15): D20 + {player.HackPTS} (Roll: {roll.BaseRoll}) = {roll.Total}");
                     if (roll.IsSuccess)
@@ -166,7 +265,25 @@ namespace CyberHeistButuan
 
                 if (int.TryParse(entryChoice, out int targetIndex) && targetIndex > 0 && targetIndex <= options.Count)
                 {
-                    var targetDestination = options[targetIndex - 1];
+                    RoomNode targetDestination;
+                    if (insideVents)
+                    {
+                        var (ventShafts, dropDownRooms) = nav.GetVentNavigationOptions();
+                        if (targetIndex <= ventShafts.Count)
+                        {
+                            targetDestination = ventShafts[targetIndex - 1];
+                        }
+                        else
+                        {
+                            targetDestination = dropDownRooms[targetIndex - ventShafts.Count - 1];
+                        }
+                    }
+                    else
+                    {
+                        targetDestination = options[targetIndex - 1];
+                    }
+
+                    player.TotalTurns++;
 
                     if (nav.RequiresSneakCheck(targetDestination))
                     {
@@ -177,23 +294,26 @@ namespace CyberHeistButuan
                         if (check.IsSuccess)
                         {
                             Terminal_Render.PrintSuccess("PASS! Slipped through security monitors cleanly.");
+                            player.StealthPasses++;
                             detectionSystem.RecordCheckResult(true);
-                            nav.MoveTo(targetDestination.RoomId, player); // Passed player
+                            nav.MoveTo(targetDestination.RoomId, player);
                         }
                         else
                         {
                             Terminal_Render.PrintAlarm("FAIL! Motion alarms triggered by the checkpoint monitors.");
+                            player.StealthFails++;
                             detectionSystem.RecordCheckResult(false);
-                            nav.MoveTo(targetDestination.RoomId, player); // Passed player
+                            nav.MoveTo(targetDestination.RoomId, player);
                         }
                     }
                     else
                     {
-                        nav.MoveTo(targetDestination.RoomId, player); // Passed player
+                        nav.MoveTo(targetDestination.RoomId, player);
                         Terminal_Render.PrintAmbient($"\nMoved quietly into {targetDestination.RoomName}.");
                     }
 
                     detectionSystem.ProcessTurn();
+                    exfil.ProcessHelipadTurn();
                     Console.ReadKey(true);
                 }
                 else
@@ -219,17 +339,31 @@ namespace CyberHeistButuan
         private static void RenderStatusHUD(Player p, Detection_System ds, Nav_Manager nav, bool gotData)
         {
             Console.WriteLine("================================================================================");
-            Console.Write($"HP: {p.CurrentHP}/{p.MaxHP} | hackPTS: +{p.HackPTS} | sneakPTS: +{p.SneakPTS} | fightPTS: +{p.FightPTS}");
+            Console.Write($"HP: {p.CurrentHP:F1}/{p.MaxHP} | hackPTS: +{p.HackPTS} | sneakPTS: +{p.SneakPTS} | fightPTS: +{p.FightPTS}");
             
             if (p.IsMoist)
             {
-                Console.Write(" | ");
                 Console.ForegroundColor = ConsoleColor.Yellow;
-                Console.Write("[STATUS: MOIST]");
+                Console.Write(" [STATUS: MOIST]");
                 Console.ResetColor();
             }
-
-            Console.Write($" | Data Drive: {(gotData ? "SECURED" : "MISSING")}\n");
+            Console.Write(" | ");
+            Console.ForegroundColor = ConsoleColor.Blue;
+            Console.Write($"Data Drive: ");
+            switch (gotData)
+            {
+                case true:
+                    Console.ForegroundColor = ConsoleColor.Green;
+                    Console.Write("SECURED\n");
+                    Console.ResetColor();
+                    break;
+                case false:
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.Write("MISSING\n");
+                    Console.ResetColor();
+                    break;
+            }
+    
 
             Console.Write("Alert Level: ");
             switch (ds.CurrentState)
@@ -272,7 +406,12 @@ namespace CyberHeistButuan
                 ""description"": ""A polished lobby with modern corporate aesthetics. A reception desk and security terminals stand near the entrance."",
                 ""baseDC"": 10,
                 ""isMonitored"": true,
-                ""connections"": [""outside"", ""employee_hallway_l1"", ""lobby_vents"", ""emergency_room""]
+                ""connections"": [
+                  ""outside"",
+                  ""employee_hallway_l1"",
+                  ""lobby_vents"",
+                  ""emergency_room""
+                ]
               },
               {
                 ""roomId"": ""emergency_room"",
@@ -288,7 +427,12 @@ namespace CyberHeistButuan
                 ""description"": ""A dark, cramped duct system positioned directly above the main reception lobby."",
                 ""baseDC"": 10,
                 ""isMonitored"": false,
-                ""connections"": [""lobby"", ""power_room_vents"", ""mainframe_room_vents"", ""maintenance_room_vents""]
+                ""connections"": [
+                  ""lobby"",
+                  ""power_room_vents"",
+                  ""mainframe_room_vents"",
+                  ""maintenance_room_vents""
+                ]
               },
               {
                 ""roomId"": ""employee_hallway_l1"",
@@ -304,7 +448,12 @@ namespace CyberHeistButuan
                 ""description"": ""A higher security restricted section. Power distribution and backup grid rooms connect to this floor."",
                 ""baseDC"": 15,
                 ""isMonitored"": true,
-                ""connections"": [""employee_hallway_l1"", ""employee_hallway_l3"", ""power_room"", ""lobby_vents""]
+                ""connections"": [
+                  ""employee_hallway_l1"",
+                  ""employee_hallway_l3"",
+                  ""power_room"",
+                  ""lobby_vents""
+                ]
               },
               {
                 ""roomId"": ""employee_hallway_l3"",
@@ -312,7 +461,7 @@ namespace CyberHeistButuan
                 ""description"": ""Maximum security level. Red ambient lights reflect off the reinforced doors leading to the mainframe compartment."",
                 ""baseDC"": 15,
                 ""isMonitored"": true,
-                ""connections"": [""employee_hallway_l2"", ""mainframe_doors"", ""lobby_vents""]
+                ""connections"": [""employee_hallway_l2"", ""mainframe_doors"", ""lobby_vents"", ""rooftop_access_corridor""]
               },
               {
                 ""roomId"": ""power_room"",
@@ -360,7 +509,7 @@ namespace CyberHeistButuan
                 ""description"": ""A humid shaft dropping into the facility maintenance areas."",
                 ""baseDC"": 10,
                 ""isMonitored"": false,
-                ""connections"": [""maintenance_room""]
+                ""connections"": [""maintenance_room"", ""rooftop_access_vents"", ""lobby_vents"", ""mainframe_room_vents""]
               },
               {
                 ""roomId"": ""maintenance_room"",
@@ -369,6 +518,30 @@ namespace CyberHeistButuan
                 ""baseDC"": 10,
                 ""isMonitored"": false,
                 ""connections"": [""power_room""]
+              },
+              {
+                ""roomId"": ""rooftop_access_vents"",
+                ""roomName"": ""Rooftop Access Vents"",
+                ""description"": ""A drafty, freezing metal shaft climbing steeply towards the rooftop structural layout."",
+                ""baseDC"": 12,
+                ""isMonitored"": false,
+                ""connections"": [""maintenance_room_vents"", ""rooftop_helipad"", ""rooftop_access_corridor""]
+              },
+              {
+                ""roomId"": ""rooftop_access_corridor"",
+                ""roomName"": ""Rooftop Access Corridor"",
+                ""description"": ""A cold, structural corridor leading to the heavy rooftop bulkhead door. Wind whistles through the concrete seams."",
+                ""baseDC"": 12,
+                ""isMonitored"": true,
+                ""connections"": [""rooftop_helipad"", ""rooftop_access_vents"", ""employee_hallway_l3""]
+              },
+              {
+                ""roomId"": ""rooftop_helipad"",
+                ""roomName"": ""Rooftop Helipad"",
+                ""description"": ""An exposed concrete landing pad overlooking the rain-slicked towers of Butuan City. Rain slashes across the illuminated yellow circles."",
+                ""baseDC"": 15,
+                ""isMonitored"": true,
+                ""connections"": [""rooftop_access_corridor"", ""rooftop_access_vents""]
               }
             ]";
         }

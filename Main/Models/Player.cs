@@ -5,9 +5,22 @@ namespace CyberHeistButuan.Models
 {
     public class Player
     {
-        public string Name { get; set; } = "Hacker";
+        public string Name { get; set; } = "Netrunner";
         public int MaxHP { get; set; } = 20;
-        public double CurrentHP { get; set; } = 20;
+
+        private double _currentHP = 20;
+        public double CurrentHP
+        {
+            get => _currentHP;
+            set
+            {
+                if (value < _currentHP)
+                {
+                    TotalDamageSustained += (_currentHP - value);
+                }
+                _currentHP = value;
+            }
+        }
         
         // Base stats
         public int HackPTS { get; set; } = 1;
@@ -23,6 +36,12 @@ namespace CyberHeistButuan.Models
 
         // Status Effects
         public bool IsMoist { get; set; } = false;
+
+        // Exfiltration & Stats Tracking
+        public int TotalTurns { get; set; } = 0;
+        public int StealthPasses { get; set; } = 0;
+        public int StealthFails { get; set; } = 0;
+        public double TotalDamageSustained { get; private set; } = 0;
 
         // Inventory system (Capped at 2 snacks)
         public List<Item> Inventory { get; set; } = new List<Item>();

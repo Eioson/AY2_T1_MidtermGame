@@ -34,7 +34,6 @@ namespace CyberHeistButuan.Engine
                 }
             }
 
-            // Set standard starting point
             if (Rooms.ContainsKey("outside"))
             {
                 CurrentRoom = Rooms["outside"];
@@ -56,7 +55,30 @@ namespace CyberHeistButuan.Engine
             return connections;
         }
 
-        // Backwards compatibility transition method
+        /// <summary>
+        /// Splits connections into vent crawlspaces and drop-down rooms to facilitate UI categorization.
+        /// </summary>
+        public (List<RoomNode> VentShafts, List<RoomNode> DropDownRooms) GetVentNavigationOptions()
+        {
+            var ventShafts = new List<RoomNode>();
+            var dropDownRooms = new List<RoomNode>();
+
+            foreach (var conn in GetConnections())
+            {
+                // Group by checking if the ID contains "vent"
+                if (conn.RoomId.Contains("vent", StringComparison.OrdinalIgnoreCase))
+                {
+                    ventShafts.Add(conn);
+                }
+                else
+                {
+                    dropDownRooms.Add(conn);
+                }
+            }
+
+            return (ventShafts, dropDownRooms);
+        }
+
         public bool MoveTo(string roomId)
         {
             if (Rooms.TryGetValue(roomId, out var target))
@@ -67,7 +89,6 @@ namespace CyberHeistButuan.Engine
             return false;
         }
 
-        // Overload to process transition checks and notifications
         public bool MoveTo(string roomId, Player player)
         {
             if (Rooms.TryGetValue(roomId, out var target))
@@ -83,7 +104,6 @@ namespace CyberHeistButuan.Engine
         {
             if (player == null) return;
 
-            // Trigger "Moist" status when entering Maintenance Room
             if (target.RoomId.Equals("maintenance_room", StringComparison.OrdinalIgnoreCase))
             {
                 if (!player.IsMoist)
@@ -92,9 +112,9 @@ namespace CyberHeistButuan.Engine
                     Terminal_Render.PrintStatusWarning(
                         "Hazardous Maintenance Zone Entered",
                         "[STATUS EFFECT] You stepped into grease, sewage, and leaking high-humidity pipe run-offs!\n" +
-                        "[STATUS EFFECT] You are now MOIST.\n\n" +
+                        "               You are now MOIST.\n\n" +
                         "[MECHANICAL PENALTY] Your squelching boots make noise: Sneak Capabilities reduced (-2 SneakPTS).\n" +
-                        "Warning: Entering highly electrified rooms while wet has severe electrical hazard risks!"
+                        "                     Warning: Entering highly electrified rooms (like the Power Room) while wet carries severe electrical hazard risks!"
                     );
                 }
                 else
@@ -105,26 +125,24 @@ namespace CyberHeistButuan.Engine
                     );
                 }
             }
-            // Hazard penalty: Entering Power Room while Moist triggers electrical damage
             else if (target.RoomId.Equals("power_room", StringComparison.OrdinalIgnoreCase) && player.IsMoist)
             {
-                player.IsMoist = false; // Arc drying effect
+                player.IsMoist = false;
                 double damage = 3.0;
                 player.CurrentHP = Math.Max(0.0, player.CurrentHP - damage);
                 
                 Terminal_Render.PrintStatusWarning(
                     "High Voltage Discharge / Arc Flash!",
-                    $"[HAZARD TRIGGERED] The wet film on your suit bridges the electrical gap with the generators!\n\n" +
+                    $"[HAZARD TRIGGERED] The moisture on your suit forms an electrical bridge with the humming generators!\n\n" +
                     $"[DAMAGE] You take {damage} points of high-voltage shock damage!\n" +
-                    $"         Your current HP status is: {player.CurrentHP}/{player.MaxHP}.\n" +
-                    $"         The thermal flash has dried your gear (MOIST status removed)."
+                    $"         Your current HP is now: {player.CurrentHP}/{player.MaxHP}.\n" +
+                    $"         The sudden intense thermal energy has dried your suit (MOIST status removed)."
                 );
             }
         }
 
         public bool RequiresSneakCheck(RoomNode target)
         {
-            // Zone-Based Approach: Patrolled / High-Security Areas require D20 check
             return target.IsMonitored;
         }
     }

@@ -68,7 +68,7 @@
     "description": "Maximum security level. Red ambient lights reflect off the reinforced doors leading to the mainframe compartment.",
     "baseDC": 15,
     "isMonitored": true,
-    "connections": ["employee_hallway_l2", "mainframe_doors", "lobby_vents"]
+    "connections": ["employee_hallway_l2", "mainframe_doors", "lobby_vents", "rooftop_access_corridor"]
   },
   {
     "roomId": "power_room",
@@ -116,7 +116,7 @@
     "description": "A humid shaft dropping into the facility maintenance areas.",
     "baseDC": 10,
     "isMonitored": false,
-    "connections": ["maintenance_room"]
+    "connections": [ "maintenance_room", "rooftop_access_vents", "lobby_vents", "mainframe_room_vents" ]
   },
   {
     "roomId": "maintenance_room",
@@ -125,5 +125,29 @@
     "baseDC": 10,
     "isMonitored": false,
     "connections": ["power_room"]
+  },
+   {
+    "roomId": "rooftop_access_vents",
+    "roomName": "Rooftop Access Vents",
+    "description": "A drafty, freezing metal shaft climbing steeply towards the rooftop structural layout.",
+    "baseDC": 12,
+    "isMonitored": false,
+    "connections": [ "maintenance_room_vents", "rooftop_helipad", "rooftop_access_corridor" ]
+  },
+  {
+    "roomId": "rooftop_access_corridor",
+    "roomName": "Rooftop Access Corridor",
+    "description": "A cold, structural corridor leading to the heavy rooftop bulkhead door. Wind whistles through the concrete seams.",
+    "baseDC": 12,
+    "isMonitored": true,
+    "connections": ["rooftop_helipad", "rooftop_access_vents", "employee_hallway_l3"]
+  },
+  {
+    "roomId": "rooftop_helipad",
+    "roomName": "Rooftop Helipad",
+    "description": "An exposed concrete landing pad overlooking the rain-slicked towers of Butuan City. Rain slashes across the illuminated yellow circles.",
+    "baseDC": 15,
+    "isMonitored": true,
+    "connections": ["rooftop_access_corridor", "rooftop_access_vents"]
   }
 ]
